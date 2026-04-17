@@ -2,9 +2,13 @@ services:
   db:
     image: postgres:18-alpine
     environment:
-      - POSTGRES_PASSWORD=B0tw3ll1s1nL0v3!
+      - POSTGRES_USER: postgres
+      - POSTGRES_PASSWORD: B0tw3ll1s1nL0v3!
+      - POSTGRES_DB: campers_db
     volumes:
       - db-data: /var/lib/postgresql/data
+    ports:
+      - "5432:5432"
   frontend:
     build: ./frontend
     ports:
