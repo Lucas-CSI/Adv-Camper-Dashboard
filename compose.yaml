@@ -1,0 +1,21 @@
+services:
+  db:
+    image: postgres:18-alpine
+    environment:
+      - POSTGRES_PASSWORD=B0tw3ll1s1nL0v3!
+    volumes:
+      - db-data: /var/lib/postgresql/data
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+  backend:
+    build: ./backend
+    ports: 
+      - "8080:8080"
+    environment:
+    depends_on:
+      db:
+        condition: service_healthy
