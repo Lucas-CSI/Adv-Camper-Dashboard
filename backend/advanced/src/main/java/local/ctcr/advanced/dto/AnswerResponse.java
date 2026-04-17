@@ -4,22 +4,10 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
-// ─── AnswerSubmitRequest ──────────────────────────────────────────────────────
-// Used by POST /api/questions/{questionId}/answer
-@Data
-public class AnswerSubmitRequest {
-
-    @NotNull
-    private Long questionId;
-
-    @NotBlank
-    private String answerGiven;
-}
-
 // ─── AnswerResponse ───────────────────────────────────────────────────────────
 // Returned after answer submission — never exposes the raw correct answer
 @Data
-class AnswerResponse {
+public class AnswerResponse {
     private boolean correct;
     private int pointsAwarded;
     private int attemptNumber;

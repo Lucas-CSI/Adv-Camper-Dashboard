@@ -1,9 +1,9 @@
 package local.ctcr.advanced.controller;
 
-import com.example.dto.AnswerDTOs.AnswerResponse;
-import com.example.dto.AnswerDTOs.AnswerSubmitRequest;
-import com.example.model.User;
-import com.example.service.AnswerService;
+import local.ctcr.advanced.dto.AnswerResponse;
+import local.ctcr.advanced.dto.AnswerSubmitRequest;
+import local.ctcr.advanced.model.User;
+import local.ctcr.advanced.service.AnswerService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

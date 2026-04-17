@@ -1,6 +1,6 @@
 package local.ctcr.advanced.repository;
 
-import com.example.model.User;
+import local.ctcr.advanced.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

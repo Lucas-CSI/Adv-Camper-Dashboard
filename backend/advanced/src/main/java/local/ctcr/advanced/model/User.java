@@ -1,4 +1,4 @@
-package com.example.model;
+package local.ctcr.advanced.model;
 
 import jakarta.persistence.*;
 import lombok.*;

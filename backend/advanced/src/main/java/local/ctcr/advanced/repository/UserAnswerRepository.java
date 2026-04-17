@@ -1,6 +1,6 @@
-package com.example.repository;
+package local.ctcr.advanced.repository;
 
-import com.example.model.UserAnswer;
+import local.ctcr.advanced.model.UserAnswer;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

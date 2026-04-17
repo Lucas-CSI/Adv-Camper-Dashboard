@@ -1,8 +1,8 @@
 package local.ctcr.advanced.controller;
 
-import com.example.model.Module;
-import com.example.service.ModuleService;
-import com.example.service.UserProgressService;
+import local.ctcr.advanced.model.Module;
+import local.ctcr.advanced.service.ModuleService;
+import local.ctcr.advanced.service.UserProgressService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -44,7 +44,7 @@ public class ModuleController {
     public ResponseEntity<Boolean> isModuleCompleted(
             @PathVariable Long id,
             @AuthenticationPrincipal UserDetails userDetails) {
-        Long userId = ((com.example.model.User) userDetails).getId();
+        Long userId = ((local.ctcr.advanced.model.User) userDetails).getId();
         return ResponseEntity.ok(userProgressService.hasCompletedModule(userId, id));
     }
 

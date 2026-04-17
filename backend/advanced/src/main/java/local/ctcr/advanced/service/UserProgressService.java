@@ -1,10 +1,10 @@
 package local.ctcr.advanced.service;
 
-import com.example.model.Lesson;
-import com.example.model.User;
-import com.example.model.UserProgress;
-import com.example.repository.UserProgressRepository;
-import com.example.repository.UserRepository;
+import local.ctcr.advanced.model.Lesson;
+import local.ctcr.advanced.model.User;
+import local.ctcr.advanced.model.UserProgress;
+import local.ctcr.advanced.repository.UserProgressRepository;
+import local.ctcr.advanced.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

@@ -1,7 +1,7 @@
 package local.ctcr.advanced.service;
 
-import com.example.model.Module;
-import com.example.repository.ModuleRepository;
+import local.ctcr.advanced.model.Module;
+import local.ctcr.advanced.repository.ModuleRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

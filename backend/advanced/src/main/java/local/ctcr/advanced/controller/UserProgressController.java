@@ -1,8 +1,8 @@
 package local.ctcr.advanced.controller;
 
-import com.example.model.User;
-import com.example.model.UserProgress;
-import com.example.service.UserProgressService;
+import local.ctcr.advanced.model.User;
+import local.ctcr.advanced.model.UserProgress;
+import local.ctcr.advanced.service.UserProgressService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
