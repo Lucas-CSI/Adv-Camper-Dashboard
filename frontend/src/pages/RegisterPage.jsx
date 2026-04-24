@@ -6,13 +6,13 @@ import { Alert, Spinner } from "../components/ui";
 export default function RegisterPage() {
   const { register, error } = useAuth();
   const navigate = useNavigate();
-  const [form, setForm] = useState({ username: "", email: "", password: "" });
+  const [form, setForm] = useState({ username: "", password: "" });
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    const ok = await register(form.username, form.email, form.password);
+    const ok = await register(form.username, form.password);
     setLoading(false);
     if (ok) navigate("/dashboard");
   };
@@ -47,14 +47,6 @@ export default function RegisterPage() {
             </label>
             <input className="input" placeholder="your_handle" value={form.username}
               onChange={set("username")} required minLength={3} maxLength={30} />
-          </div>
-
-          <div>
-            <label className="block text-xs font-display font-medium text-cyber-subtext mb-1.5 uppercase tracking-wide">
-              Email
-            </label>
-            <input type="email" className="input" placeholder="you@example.com"
-              value={form.email} onChange={set("email")} required />
           </div>
 
           <div>
