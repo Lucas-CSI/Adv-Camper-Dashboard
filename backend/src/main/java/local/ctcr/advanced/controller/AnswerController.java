@@ -17,13 +17,6 @@ import org.springframework.web.bind.annotation.*;
 public class AnswerController {
 
     private final AnswerService answerService;
-
-    /**
-     * POST /api/questions/{questionId}/answer
-     * Submit an answer for a specific question.
-     *
-     * The correct answer is NEVER returned — only correct/incorrect + explanation.
-     */
     @PostMapping("/{questionId}/answer")
     public ResponseEntity<AnswerResponse> submitAnswer(
             @PathVariable Long questionId,
