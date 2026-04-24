@@ -5,13 +5,6 @@ import lombok.*;
 
 import java.util.List;
 
-/**
- * Updated Question — adds type enum, correctAnswer, hint, explanation,
- * points, and ordering. Merge these fields into your existing Question entity.
- *
- * IMPORTANT: correctAnswer is never serialized to JSON (see @JsonIgnore below).
- * Answer validation happens server-side in AnswerService only.
- */
 @Entity
 @Table(name = "questions")
 @Getter

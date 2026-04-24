@@ -4,13 +4,6 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.List;
-
-/**
- * Updated Lesson — adds module association, ordering, difficulty,
- * and estimated time so it integrates with Module and UserProgress.
- *
- * Merge these fields into your existing Lesson entity.
- */
 @Entity
 @Table(name = "lessons")
 @Getter
