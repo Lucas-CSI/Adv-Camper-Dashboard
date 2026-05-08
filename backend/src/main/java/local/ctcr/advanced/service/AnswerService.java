@@ -17,11 +17,10 @@ public class AnswerService {
     private final UserRepository userRepository;
     private final QuestionRepository questionRepository;
 
-    private static final int HINT_AFTER_ATTEMPTS = 2; // show hint after 2 wrong tries
+    private static final int HINT_AFTER_ATTEMPTS = 2;
 
     @Transactional
     public AnswerResponse submitAnswer(Long userId, AnswerSubmitRequest request) {
-        // Load user and question (replace with your actual Question fetch)
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
@@ -55,57 +54,40 @@ public class AnswerService {
                 .build();
         userAnswerRepository.save(answer);
 
-        // Update lesson progress if the lesson is now fully answered correctly
+        // Check if the lesson is now fully completed
         boolean lessonCompleted = false;
         if (isCorrect) {
-            lessonCompleted = checkAndCompletLesson(user, question, pointsAwarded);
+            lessonCompleted = checkAndCompleteLesson(user, question, pointsAwarded);
         }
 
-        // Build response
         AnswerResponse response = new AnswerResponse();
         response.setCorrect(isCorrect);
         response.setPointsAwarded(pointsAwarded);
         response.setAttemptNumber(attemptCount + 1);
         response.setLessonCompleted(lessonCompleted);
-
-        // Show explanation after any answer
         response.setExplanation(question.getExplanation());
 
-        // Show hint after enough wrong attempts
-        if (!isCorrect && attemptCount + 1 >= HINT_AFTER_ATTEMPTS) {
+        // Reveal hint after enough wrong attempts
+        if (!isCorrect && (attemptCount + 1) >= HINT_AFTER_ATTEMPTS) {
             response.setHint(question.getHint());
         }
 
         return response;
     }
 
-    /**
-     * Validates the user's answer against the stored correct answer.
-     * Extend this method to handle different question types (e.g. multiple choice, flag, free text).
-     */
     private boolean validate(Question question, String answerGiven) {
-        if (question == null || answerGiven == null) return false;
-
+        if (answerGiven == null) return false;
         String correct = question.getCorrectAnswer().trim();
         String given = answerGiven.trim();
-
         return switch (question.getType()) {
-            // Flag: THM{...} — case-insensitive exact match
             case FLAG_SUBMISSION -> correct.equalsIgnoreCase(given);
-            // Multiple choice: match the stored option ID or text
             case MULTIPLE_CHOICE -> correct.equalsIgnoreCase(given);
-            // Free text: normalize whitespace and case
-            case FREE_TEXT -> correct.equalsIgnoreCase(given);
+            case FREE_TEXT       -> correct.equalsIgnoreCase(given);
         };
     }
 
-    /**
-     * Checks if all questions in the lesson have been answered correctly,
-     * and marks the lesson as completed if so.
-     */
-    private boolean checkAndCompletLesson(User user, Question question, int pointsForThisAnswer) {
+    private boolean checkAndCompleteLesson(User user, Question question, int pointsForThisAnswer) {
         Lesson lesson = question.getLesson();
-
         long totalQuestions = lesson.getQuestions().size();
         long correctlyAnswered = lesson.getQuestions().stream()
                 .filter(q -> userAnswerRepository
@@ -114,7 +96,6 @@ public class AnswerService {
 
         if (correctlyAnswered < totalQuestions) return false;
 
-        // All questions answered — mark lesson complete
         UserProgress progress = userProgressRepository
                 .findByUserIdAndLessonId(user.getId(), lesson.getId())
                 .orElse(UserProgress.builder().user(user).lesson(lesson).build());

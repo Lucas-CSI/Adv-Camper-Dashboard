@@ -1,3 +1,4 @@
+
 package local.ctcr.advanced.config;
 
 import local.ctcr.advanced.repository.UserRepository;
@@ -20,15 +21,17 @@ public class ApplicationConfig {
 
     private final UserRepository userRepository;
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
 
     @Bean
     public UserDetailsService userDetailsService(){
         return username -> userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException(username));
     }
+
+    /*@Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
 
     @Bean
     public AuthenticationProvider authenticationProvider() {
@@ -41,5 +44,5 @@ public class ApplicationConfig {
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) {
         return authenticationConfiguration.getAuthenticationManager();
-    }
+    }*/
 }

@@ -8,13 +8,13 @@ public class AuthResponse {
 
     private String token;
     private String username;
-    private User.Role role;
+    private String role;
     private Integer totalPoints;
 
     public AuthResponse(String token, User user) {
         this.token = token;
         this.username = user.getUsername();
-        this.role = user.getRole();
+        this.role = "ROLE_" + user.getRole().name();
         this.totalPoints = user.getTotalPoints();
     }
 }

@@ -4,7 +4,7 @@ function getToken() {
   return localStorage.getItem("token");
 }
 
-async function request(path, options = {}) {
+export async function request(path, options = {}) {
   const token = getToken();
   const headers = {
     "Content-Type": "application/json",
@@ -29,7 +29,6 @@ async function request(path, options = {}) {
   return res.json();
 }
 
-// ── Auth ──────────────────────────────────────────────────────────────────────
 export const authApi = {
   register: (data) =>
     request("/auth/register", { method: "POST", body: JSON.stringify(data) }),
@@ -37,11 +36,10 @@ export const authApi = {
     request("/auth/login", { method: "POST", body: JSON.stringify(data) }),
 };
 
-// ── Modules ───────────────────────────────────────────────────────────────────
 export const modulesApi = {
   getAll: () => request("/modules"),
   getById: (id) => request(`/modules/${id}`),
-  getBySlug: (slug) => request(`sdsassssssssssssssss/modules/slug/${slug}`),
+  getBySlug: (slug) => request(`/modules/slug/${slug}`),
   isCompleted: (id) => request(`/modules/${id}/completed`),
   create: (data) =>
     request("/modules", { method: "POST", body: JSON.stringify(data) }),
@@ -50,7 +48,27 @@ export const modulesApi = {
   delete: (id) => request(`/modules/${id}`, { method: "DELETE" }),
 };
 
-// ── Progress ──────────────────────────────────────────────────────────────────
+export const lessonsApi = {
+  getById: (id) => request(`/lessons/${id}`),
+  getByModule: (moduleId) => request(`/lessons/module/${moduleId}`),
+  create: (data) =>
+    request("/lessons", { method: "POST", body: JSON.stringify(data) }),
+  update: (id, data) =>
+    request(`/lessons/${id}`, { method: "PUT", body: JSON.stringify(data) }),
+  delete: (id) => request(`/lessons/${id}`, { method: "DELETE" }),
+};
+
+
+export const questionsApi = {
+  getByLesson: (lessonId) => request(`/questions/lesson/${lessonId}`),
+  create: (data) =>
+    request("/questions", { method: "POST", body: JSON.stringify(data) }),
+  update: (id, data) =>
+    request(`/questions/${id}`, { method: "PUT", body: JSON.stringify(data) }),
+  delete: (id) => request(`/questions/${id}`, { method: "DELETE" }),
+};
+
+
 export const progressApi = {
   getAll: () => request("/progress"),
   getCompleted: () => request("/progress/completed"),
@@ -61,7 +79,7 @@ export const progressApi = {
     request(`/progress/modules/${moduleId}/completed`),
 };
 
-// ── Questions & Answers ───────────────────────────────────────────────────────
+
 export const answersApi = {
   submit: (questionId, answerGiven) =>
     request(`/questions/${questionId}/answer`, {

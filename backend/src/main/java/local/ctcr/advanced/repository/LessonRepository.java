@@ -7,8 +7,14 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
+
+import java.util.List;
+
 @Repository
 public interface LessonRepository extends JpaRepository<Lesson, Long> {
-    @Query
-    Optional<Lesson> findById(Long Id);
+
+    List<Lesson> findByModuleIdOrderByDisplayOrderAsc(Long moduleId);
+
+    long countByModuleId(Long moduleId);
 }
+

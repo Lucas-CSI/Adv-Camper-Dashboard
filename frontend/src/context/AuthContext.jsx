@@ -5,8 +5,14 @@ const AuthContext = createContext(null);
 
 function parseUser(token) {
   try {
-    const payload = JSON.parse(atob(token.split(".")[1]));
-    return { username: payload.sub, role: payload.roles?.[0] };
+    const base64 = token.split(".")[1]
+      .replace(/-/g, "+")
+      .replace(/_/g, "/");
+    const payload = JSON.parse(atob(base64));
+    return {
+      username: payload.sub,
+      role: payload.role || payload.roles?.[0] || null,
+    };
   } catch {
     return null;
   }
@@ -26,7 +32,11 @@ export function AuthProvider({ children }) {
       const data = await authApi.login({ username, password });
       localStorage.setItem("token", data.token);
       setToken(data.token);
-      setUser({ username: data.username, role: data.role, totalPoints: data.totalPoints });
+      setUser({
+        username: data.username,
+        role: data.role,
+        totalPoints: data.totalPoints,
+      });
       return true;
     } catch (e) {
       setError(e.message);
@@ -34,13 +44,17 @@ export function AuthProvider({ children }) {
     }
   }, []);
 
-  const register = useCallback(async (username, email, password) => {
+  const register = useCallback(async (username, password) => {
     setError(null);
     try {
-      const data = await authApi.register({ username, email, password });
+      const data = await authApi.register({ username, password });
       localStorage.setItem("token", data.token);
       setToken(data.token);
-      setUser({ username: data.username, role: data.role, totalPoints: data.totalPoints });
+      setUser({
+        username: data.username,
+        role: data.role,
+        totalPoints: data.totalPoints,
+      });
       return true;
     } catch (e) {
       setError(e.message);

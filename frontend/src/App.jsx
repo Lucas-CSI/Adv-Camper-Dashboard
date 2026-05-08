@@ -11,6 +11,11 @@ import ModulesPage from "./pages/ModulesPage";
 import ModuleDetailPage from "./pages/ModuleDetailPage";
 import LessonPage from "./pages/LessonPage";
 
+import AdminDashboard from "./pages/admin/AdminDashboard";
+import ModuleFormPage from "./pages/admin/ModuleFormPage";
+import LessonFormPage from "./pages/admin/LessonFormPage";
+import QuestionsManagerPage from "./pages/admin/QuestionsManagerPage";
+
 export default function App() {
   return (
     <AuthProvider>
@@ -24,12 +29,32 @@ export default function App() {
           <Route path="/modules" element={<ModulesPage />} />
           <Route path="/modules/:id" element={<ModuleDetailPage />} />
 
-          {/* Protected */}
+          {/* Student — requires auth */}
           <Route path="/dashboard" element={
             <ProtectedRoute><DashboardPage /></ProtectedRoute>
           } />
           <Route path="/lessons/:id" element={
             <ProtectedRoute><LessonPage /></ProtectedRoute>
+          } />
+
+          {/* Admin — requires ROLE_ADMIN */}
+          <Route path="/admin" element={
+            <ProtectedRoute adminOnly><AdminDashboard /></ProtectedRoute>
+          } />
+          <Route path="/admin/modules/new" element={
+            <ProtectedRoute adminOnly><ModuleFormPage /></ProtectedRoute>
+          } />
+          <Route path="/admin/modules/:id/edit" element={
+            <ProtectedRoute adminOnly><ModuleFormPage /></ProtectedRoute>
+          } />
+          <Route path="/admin/modules/:moduleId/lessons/new" element={
+            <ProtectedRoute adminOnly><LessonFormPage /></ProtectedRoute>
+          } />
+          <Route path="/admin/lessons/:lessonId/edit" element={
+            <ProtectedRoute adminOnly><LessonFormPage /></ProtectedRoute>
+          } />
+          <Route path="/admin/lessons/:lessonId/questions" element={
+            <ProtectedRoute adminOnly><QuestionsManagerPage /></ProtectedRoute>
           } />
         </Routes>
       </BrowserRouter>

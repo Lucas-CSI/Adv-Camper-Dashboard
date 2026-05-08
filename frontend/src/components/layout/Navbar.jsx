@@ -40,9 +40,12 @@ export default function Navbar() {
               Modules
             </Link>
             {user.role === "ROLE_ADMIN" && (
-              <span className="badge bg-cyber-accent/10 text-cyber-accent border border-cyber-accent/30">
-                Admin
-              </span>
+              <Link to="/admin"
+                className={`nav-link ${isActive("/admin") ? "text-cyber-accent" : ""}`}>
+                <span className="badge bg-cyber-accent/10 text-cyber-accent border border-cyber-accent/30">
+                  Admin
+                </span>
+              </Link>
             )}
           </div>
         )}
