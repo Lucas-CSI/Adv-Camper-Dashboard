@@ -1,5 +1,6 @@
 package local.ctcr.advanced.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
@@ -41,9 +42,11 @@ public class User implements UserDetails {
     @Builder.Default
     private LocalDateTime createdAt = LocalDateTime.now();
 
+    @JsonIgnore
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<UserProgress> progressList;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<UserAnswer> answers;
 

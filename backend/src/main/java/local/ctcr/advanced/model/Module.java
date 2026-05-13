@@ -1,5 +1,6 @@
 package local.ctcr.advanced.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -41,6 +42,7 @@ public class Module {
     @Column(name = "image_url")
     private String imageUrl;
 
+    @JsonManagedReference("module-lessons")
     @OneToMany(mappedBy = "module", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @OrderBy("displayOrder ASC")
     private List<Lesson> lessons;

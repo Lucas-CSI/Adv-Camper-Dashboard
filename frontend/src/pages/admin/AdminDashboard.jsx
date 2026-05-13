@@ -5,6 +5,7 @@ import { DifficultyBadge, Spinner } from "../../components/ui";
 
 export default function AdminDashboard() {
   const [modules, setModules] = useState([]);
+  const [expanded, setExpanded] = useState({});
   const [loading, setLoading] = useState(true);
   const [deleting, setDeleting] = useState(null);
   const [error, setError] = useState(null);
@@ -19,9 +20,12 @@ export default function AdminDashboard() {
 
   useEffect(() => { load(); }, []);
 
-  const handleDelete = async (mod) => {
+  const toggleExpand = (id) =>
+    setExpanded((prev) => ({ ...prev, [id]: !prev[id] }));
+
+  const handleDeleteModule = async (mod) => {
     if (!window.confirm(`Delete "${mod.title}" and all its lessons? This cannot be undone.`)) return;
-    setDeleting(mod.id);
+    setDeleting(`mod-${mod.id}`);
     try {
       await modulesApi.delete(mod.id);
       setModules((prev) => prev.filter((m) => m.id !== mod.id));
@@ -31,6 +35,8 @@ export default function AdminDashboard() {
       setDeleting(null);
     }
   };
+
+  const totalLessons = modules.reduce((a, m) => a + (m.lessons?.length ?? 0), 0);
 
   return (
     <div className="min-h-screen pt-14">
@@ -48,7 +54,7 @@ export default function AdminDashboard() {
               Manage content
             </h1>
             <p className="text-cyber-subtext text-sm mt-1">
-              Create and edit modules, lessons, and questions.
+              Create modules, add lessons, and manage questions.
             </p>
           </div>
           <Link to="/admin/modules/new" className="btn-primary flex items-center gap-2">
@@ -67,7 +73,7 @@ export default function AdminDashboard() {
         <div className="grid grid-cols-3 gap-4 mb-8">
           {[
             { label: "Total modules", value: modules.length },
-            { label: "Total lessons", value: modules.reduce((a, m) => a + (m.lessons?.length ?? 0), 0) },
+            { label: "Total lessons", value: totalLessons },
             { label: "Easy / Medium / Hard", value: `${modules.filter(m => m.difficulty === "EASY").length} / ${modules.filter(m => m.difficulty === "MEDIUM").length} / ${modules.filter(m => m.difficulty === "HARD").length}` },
           ].map((stat) => (
             <div key={stat.label} className="card p-4">
@@ -77,7 +83,7 @@ export default function AdminDashboard() {
           ))}
         </div>
 
-        {/* Modules table */}
+        {/* Modules list */}
         {loading ? (
           <div className="flex justify-center py-20"><Spinner size="lg" /></div>
         ) : modules.length === 0 ? (
@@ -88,59 +94,104 @@ export default function AdminDashboard() {
             </Link>
           </div>
         ) : (
-          <div className="card overflow-hidden">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b border-cyber-border">
-                  <th className="text-left px-5 py-3 text-xs font-display font-medium text-cyber-muted uppercase tracking-wide">Module</th>
-                  <th className="text-left px-5 py-3 text-xs font-display font-medium text-cyber-muted uppercase tracking-wide hidden md:table-cell">Difficulty</th>
-                  <th className="text-left px-5 py-3 text-xs font-display font-medium text-cyber-muted uppercase tracking-wide hidden md:table-cell">Lessons</th>
-                  <th className="text-left px-5 py-3 text-xs font-display font-medium text-cyber-muted uppercase tracking-wide hidden md:table-cell">Order</th>
-                  <th className="px-5 py-3" />
-                </tr>
-              </thead>
-              <tbody>
-                {modules.map((mod, i) => (
-                  <tr key={mod.id}
-                    className="border-b border-cyber-border last:border-0 hover:bg-cyber-surface/50 transition-colors">
-                    <td className="px-5 py-4">
-                      <p className="font-display font-medium text-cyber-text text-sm">{mod.title}</p>
-                      <p className="font-mono text-xs text-cyber-muted mt-0.5">{mod.slug}</p>
-                    </td>
-                    <td className="px-5 py-4 hidden md:table-cell">
+          <div className="space-y-3">
+            {modules.map((mod) => (
+              <div key={mod.id} className="card overflow-hidden">
+
+                {/* Module row */}
+                <div className="flex items-center gap-4 px-5 py-4 hover:bg-cyber-surface/40 transition-colors">
+                  {/* Expand toggle */}
+                  <button onClick={() => toggleExpand(mod.id)}
+                    className="text-cyber-muted hover:text-cyber-accent transition-colors flex-shrink-0">
+                    <svg viewBox="0 0 20 20" fill="currentColor"
+                      className={`w-4 h-4 transition-transform duration-150 ${expanded[mod.id] ? "rotate-90" : ""}`}>
+                      <path fillRule="evenodd" d="M7.293 4.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L10.586 9 7.293 5.707a1 1 0 010-1.414z" clipRule="evenodd"/>
+                    </svg>
+                  </button>
+
+                  {/* Info */}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-3">
+                      <p className="font-display font-semibold text-cyber-text text-sm">{mod.title}</p>
                       <DifficultyBadge difficulty={mod.difficulty} />
-                    </td>
-                    <td className="px-5 py-4 hidden md:table-cell">
-                      <span className="font-mono text-sm text-cyber-subtext">
-                        {mod.lessons?.length ?? 0}
-                      </span>
-                    </td>
-                    <td className="px-5 py-4 hidden md:table-cell">
-                      <span className="font-mono text-sm text-cyber-subtext">
-                        #{mod.displayOrder}
-                      </span>
-                    </td>
-                    <td className="px-5 py-4">
-                      <div className="flex items-center justify-end gap-3">
+                    </div>
+                    <p className="font-mono text-xs text-cyber-muted mt-0.5">
+                      {mod.slug} · {mod.lessons?.length ?? 0} lesson{(mod.lessons?.length ?? 0) !== 1 ? "s" : ""}
+                    </p>
+                  </div>
+
+                  {/* Module actions */}
+                  <div className="flex items-center gap-4 flex-shrink-0">
+                    <Link to={`/admin/modules/${mod.id}/lessons/new`}
+                      className="text-xs font-display text-cyber-accent hover:underline">
+                      + Add lesson
+                    </Link>
+                    <Link to={`/admin/modules/${mod.id}/edit`}
+                      className="text-xs font-display text-cyber-subtext hover:text-cyber-text transition-colors">
+                      Edit
+                    </Link>
+                    <button onClick={() => handleDeleteModule(mod)}
+                      disabled={deleting === `mod-${mod.id}`}
+                      className="text-xs font-display text-red-500 hover:text-red-400 transition-colors disabled:opacity-40">
+                      {deleting === `mod-${mod.id}` ? "Deleting..." : "Delete"}
+                    </button>
+                  </div>
+                </div>
+
+                {/* Lessons sub-rows */}
+                {expanded[mod.id] && (
+                  <div className="border-t border-cyber-border">
+                    {(mod.lessons?.length ?? 0) === 0 ? (
+                      <div className="px-12 py-4 text-xs text-cyber-muted font-mono italic">
+                        No lessons yet —{" "}
                         <Link to={`/admin/modules/${mod.id}/lessons/new`}
-                          className="text-xs font-display text-cyber-accent hover:underline">
-                          + Lesson
+                          className="text-cyber-accent hover:underline not-italic">
+                          add one
                         </Link>
-                        <Link to={`/admin/modules/${mod.id}/edit`}
-                          className="text-xs font-display text-cyber-subtext hover:text-cyber-text transition-colors">
-                          Edit
-                        </Link>
-                        <button onClick={() => handleDelete(mod)}
-                          disabled={deleting === mod.id}
-                          className="text-xs font-display text-red-500 hover:text-red-400 transition-colors disabled:opacity-40">
-                          {deleting === mod.id ? "Deleting..." : "Delete"}
-                        </button>
                       </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+                    ) : (
+                      mod.lessons.map((lesson, i) => (
+                        <div key={lesson.id}
+                          className="flex items-center gap-4 px-12 py-3 border-b border-cyber-border/50
+                                     last:border-0 hover:bg-cyber-surface/30 transition-colors">
+
+                          {/* Order number */}
+                          <span className="w-5 h-5 rounded flex items-center justify-center
+                                           bg-cyber-surface border border-cyber-border
+                                           font-display font-bold text-xs text-cyber-muted flex-shrink-0">
+                            {lesson.displayOrder ?? i + 1}
+                          </span>
+
+                          {/* Lesson info */}
+                          <div className="flex-1 min-w-0">
+                            <p className="font-display font-medium text-cyber-text text-sm truncate">
+                              {lesson.title}
+                            </p>
+                            <p className="font-mono text-xs text-cyber-muted mt-0.5">
+                              {lesson.questions?.length ?? 0} question{(lesson.questions?.length ?? 0) !== 1 ? "s" : ""}
+                              {lesson.estimatedMinutes ? ` · ~${lesson.estimatedMinutes} min` : ""}
+                              {` · ${lesson.points ?? 0} pts`}
+                            </p>
+                          </div>
+
+                          {/* Lesson actions */}
+                          <div className="flex items-center gap-4 flex-shrink-0">
+                            <Link to={`/admin/lessons/${lesson.id}/questions`}
+                              className="text-xs font-display text-cyber-accent hover:underline">
+                              Manage questions
+                            </Link>
+                            <Link to={`/admin/lessons/${lesson.id}/edit`}
+                              className="text-xs font-display text-cyber-subtext hover:text-cyber-text transition-colors">
+                              Edit
+                            </Link>
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                )}
+              </div>
+            ))}
           </div>
         )}
       </div>

@@ -1,5 +1,6 @@
 package local.ctcr.advanced.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -7,8 +8,8 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(
-        name = "user_progress",
-        uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "lesson_id"})
+    name = "user_progress",
+    uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "lesson_id"})
 )
 @Getter
 @Setter
@@ -21,10 +22,12 @@ public class UserProgress {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "lesson_id", nullable = false)
     private Lesson lesson;

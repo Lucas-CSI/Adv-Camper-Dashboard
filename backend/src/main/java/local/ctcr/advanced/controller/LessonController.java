@@ -39,7 +39,7 @@ public class LessonController {
             @RequestBody Lesson lesson) {
         return ResponseEntity.ok(lessonService.updateLesson(id, lesson));
     }
-    
+
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> deleteLesson(@PathVariable Long id) {

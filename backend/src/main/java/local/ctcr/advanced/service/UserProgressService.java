@@ -3,10 +3,12 @@ package local.ctcr.advanced.service;
 import local.ctcr.advanced.model.Lesson;
 import local.ctcr.advanced.model.User;
 import local.ctcr.advanced.model.UserProgress;
+import local.ctcr.advanced.repository.LessonRepository;
 import local.ctcr.advanced.repository.UserProgressRepository;
 import local.ctcr.advanced.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -17,36 +19,39 @@ public class UserProgressService {
 
     private final UserProgressRepository userProgressRepository;
     private final UserRepository userRepository;
-    // Inject your LessonRepository here:
-    // private final LessonRepository lessonRepository;
+    private final LessonRepository lessonRepository;
 
     /**
      * Called when a user opens a lesson for the first time.
      * Creates a UserProgress record in IN_PROGRESS state.
      */
-    @Transactional
+    @Transactional(isolation = Isolation.SERIALIZABLE)
     public UserProgress startLesson(Long userId, Long lessonId) {
-        // Return existing progress if already started
+        // Always check existence first to avoid duplicate key on race conditions
         return userProgressRepository
                 .findByUserIdAndLessonId(userId, lessonId)
                 .map(existing -> {
-                    existing.markStarted(); // no-op if already IN_PROGRESS or COMPLETED
+                    existing.markStarted();
                     return userProgressRepository.save(existing);
                 })
                 .orElseGet(() -> {
                     User user = userRepository.findById(userId)
                             .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
-                    // Lesson lesson = lessonRepository.findById(lessonId)
-                    //         .orElseThrow(() -> new IllegalArgumentException("Lesson not found"));
-                    Lesson lesson = null; // TODO: replace with real fetch
+                    Lesson lesson = lessonRepository.findById(lessonId)
+                            .orElseThrow(() -> new IllegalArgumentException("Lesson not found: " + lessonId));
 
-                    UserProgress progress = UserProgress.builder()
-                            .user(user)
-                            .lesson(lesson)
-                            .build();
-                    progress.markStarted();
-                    return userProgressRepository.save(progress);
+                    // Double-check after fetching entities — another request may have inserted between queries
+                    return userProgressRepository
+                            .findByUserIdAndLessonId(userId, lessonId)
+                            .orElseGet(() -> {
+                                UserProgress progress = UserProgress.builder()
+                                        .user(user)
+                                        .lesson(lesson)
+                                        .build();
+                                progress.markStarted();
+                                return userProgressRepository.save(progress);
+                            });
                 });
     }
 

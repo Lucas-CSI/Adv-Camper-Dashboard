@@ -1,10 +1,20 @@
 package local.ctcr.advanced.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.List;
 
+/**
+ * Updated Question — adds type enum, correctAnswer, hint, explanation,
+ * points, and ordering. Merge these fields into your existing Question entity.
+ *
+ * IMPORTANT: correctAnswer is never serialized to JSON (see @JsonIgnore below).
+ * Answer validation happens server-side in AnswerService only.
+ */
 @Entity
 @Table(name = "questions")
 @Getter
@@ -21,7 +31,8 @@ public class Question {
     @Column(nullable = false, length = 1000)
     private String text;
 
-    // The lesson this question belongs to
+    // "back" side — lesson field suppressed to avoid Lesson→Question→Lesson loop
+    @JsonBackReference("lesson-questions")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "lesson_id", nullable = false)
     private Lesson lesson;
@@ -36,12 +47,8 @@ public class Question {
     @Column(columnDefinition = "TEXT")
     private String options;
 
-    /**
-     * The correct answer — NEVER expose this in API responses.
-     * Add @JsonIgnore (Jackson) or @JsonProperty(access = WRITE_ONLY) here.
-     * Validation happens only in AnswerService.validate().
-     */
-    @com.fasterxml.jackson.annotation.JsonIgnore
+    // WRITE_ONLY — accepted from admin requests but never returned in responses
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @Column(name = "correct_answer", nullable = false)
     private String correctAnswer;
 
@@ -63,6 +70,7 @@ public class Question {
     @Builder.Default
     private Integer displayOrder = 1;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "question", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<UserAnswer> answers;
 

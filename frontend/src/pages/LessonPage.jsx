@@ -1,21 +1,16 @@
 import { useEffect, useState, useCallback } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
-import { progressApi, modulesApi } from "../services/api";
+import { progressApi, modulesApi, lessonsApi } from "../services/api";
 import { useAuth } from "../context/AuthContext";
 import { Spinner, CheckIcon } from "../components/ui";
 import QuestionCard from "../components/ui/QuestionCard";
 
-// We'll fetch the lesson from its parent module for now
-// Extend with a dedicated /api/lessons/{id} endpoint when ready
+// Fetch lesson directly then load its parent module for breadcrumb
 async function fetchLesson(lessonId) {
-  const modules = await modulesApi.getAll();
-  for (const mod of modules) {
-    const full = await modulesApi.getById(mod.id);
-    const lesson = full.lessons?.find((l) => String(l.id) === String(lessonId));
-    if (lesson) return { lesson, module: full };
-  }
-  return null;
+  const lesson = await lessonsApi.getById(lessonId);
+  const mod = lesson.moduleId ? await modulesApi.getById(lesson.moduleId) : null;
+  return { lesson, module: mod };
 }
 
 export default function LessonPage() {
@@ -30,20 +25,18 @@ export default function LessonPage() {
   const [completed, setCompleted] = useState(false);
 
   useEffect(() => {
+    let cancelled = false;
     const load = async () => {
       const result = await fetchLesson(id);
-      if (!result) { setLoading(false); return; }
+      if (cancelled || !result) { setLoading(false); return; }
       setData(result);
-
-      if (user) {
-        const [prog] = await Promise.all([
-          progressApi.startLesson(id),
-        ]);
-        setProgress(prog);
+      if (user && !cancelled) {
+        await progressApi.startLesson(id);
       }
-      setLoading(false);
+      if (!cancelled) setLoading(false);
     };
     load();
+    return () => { cancelled = true; };
   }, [id, user]);
 
   const handleCorrect = useCallback((res) => {
