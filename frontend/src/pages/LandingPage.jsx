@@ -18,17 +18,12 @@ export default function LandingPage() {
 
       {/* Hero */}
       <div className="max-w-5xl mx-auto px-6 pt-32 pb-20 text-center">
-        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full
-                        border border-cyber-accent/30 bg-cyber-accent/5 mb-8 animate-in">
-          <span className="w-1.5 h-1.5 rounded-full bg-cyber-accent animate-pulse-slow" />
-          <span className="text-cyber-accent text-xs font-mono">Now in beta</span>
-        </div>
 
         <h1 className="font-display font-extrabold text-5xl md:text-7xl text-cyber-text
                        tracking-tight leading-none mb-6 animate-in"
             style={{ animationDelay: "80ms" }}>
-          Learn security.<br />
-          <span className="text-cyber-accent glow-text">Hack your way</span> up.
+          Welcome<br />
+          <span className="text-cyber-accent glow-text">Advanced Camper</span>
         </h1>
 
         <p className="text-cyber-subtext text-lg max-w-xl mx-auto mb-10 animate-in"
@@ -40,7 +35,7 @@ export default function LandingPage() {
         <div className="flex items-center justify-center gap-4 animate-in"
              style={{ animationDelay: "240ms" }}>
           <Link to="/register" className="btn-primary px-8 py-3 text-base">
-            Get started free
+            Create account
           </Link>
           <Link to="/modules" className="btn-ghost px-8 py-3 text-base">
             Browse modules
